@@ -41,7 +41,8 @@
 ; where the actual pick-up or drop-off actions take place, and the robot can only pick up or drop off packages when 
 ; it is at that station. These specific locations don't need to be modeled explicitly, after all picking up or
 ; dropping off a package can only be done when the robot is at the location, so we can assume that 
-; the robot is at the station when it is at the location.
+; the robot is at the station when it is at the location. Furthermore, the robot cannot executing pick-up or 
+; drop-off actions while it is moving.
 ; This way, the action-delay process is activated when the robot starts moving from one location to another, 
 ; and deactivated when it arrives at the destination, allowing the elapsed time to increase during the movement and trigger the deadline-missed event if the deadline is exceeded.
 
@@ -62,6 +63,7 @@
     :precondition (and 
         (at ?r ?l) 
         (package-at ?p ?l)
+        (not (moving ?r)) ; Robot cannot pick up a package while it is moving
         (free ?r) ; Robot is free (not holding any package) -> otherwise it may be already holding another package
         (not (holding ?r ?p)) ; Robot can hold only one package at a time
         (not (delivered ?p)) ; Package cannot be picked up if it's already delivered
@@ -79,6 +81,7 @@
     :precondition (and 
         (at ?r ?l)
         (goal-location ?p ?l) ; Robot must be at a location that is the package's goal location to deliver it
+        (not (moving ?r)) ; Robot cannot drop off a package while it is moving
         (holding ?r ?p)
         (not (delivered ?p)) ; Package cannot be delivered if it's already delivered
     )
