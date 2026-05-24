@@ -7,31 +7,29 @@
 
 (:types package location destination robot)
 
-(:predicates 
+(:predicates
     (at ?r - robot ?l - location) ; Robot r is at location l
     (free ?r - robot) ; Robot r is free (not holding any package)
     (connected ?l1 - location ?l2 - location) ; Location l1 is connected to location l2
-    (stored ?p - package ?l - location) ; Package p is at location l
-    (has ?p - package ?d - destination) ; Package p is destined for destination d
-    (labeled ?l - location ?d - destination) ; Location l is labeled as destination d
-    (delivered ?p - package ?d - destination) ; Package p has been delivered to its destination (assuming it's only one destination per package)
+    (package-at ?p - package ?l - location) ; Package p is at location l
+    (goal-location ?p - package ?l - location) ; Package p has a goal location l
+    (delivered ?p - package) ; Package p has been delivered to its destination (assuming it's only one destination per package)
     (holding ?r - robot ?p - package) ; Robot r is holding package p
 )
 
 
 ; Example action for picking up a package
 (:action pick-up
-    :parameters (?r - robot ?p - package ?l - location ?d - destination)
+    :parameters (?r - robot ?p - package ?l - location)
     :precondition (and 
         (at ?r ?l) 
-        (stored ?p ?l)
+        (package-at ?p ?l)
         (free ?r) ; Robot is free (not holding any package) -> otherwise it may be already holding another package
-        (has ?p ?d) ; Package has a destination -> otherwise it may be an irrelevant package, also it ensures actions matche correct package-destination pairs
-        (not (holding ?r ?p)) ; Robot can hold only one package at a time
-        (not (delivered ?p ?d)) ; Package cannot be picked up if it's already delivered
+        (not (holding ?r ?p)) ; Robot can hold only one package at a time, also prevents picking up the same package multiple times and provide info on package location
+        (not (delivered ?p)) ; Package cannot be picked up if it's already delivered
     )
     :effect (and 
-        (not (stored ?p ?l)) 
+        (not (package-at ?p ?l)) 
         (holding ?r ?p)
         (not (free ?r))
     )
@@ -39,18 +37,19 @@
 
 ; Example action for delivering a package
 (:action drop-off
-    :parameters (?r - robot ?p - package ?d - destination ?l - location)
+    :parameters (?r - robot ?p - package ?l - location)
     :precondition (and 
         (at ?r ?l)
-        (labeled ?l ?d) ; Robot must be at a location labeled as the package's destination
         (holding ?r ?p)
-        (has ?p ?d)
+        (goal-location ?p ?l) ; Robot must be at the package's goal location to deliver it
+        (not (delivered ?p)) ; Package cannot be delivered if it's already delivered
+        (not (free ?r)) ; Robot must be holding a package to drop it off
     )
     :effect (and 
         (not (holding ?r ?p)) 
-        (delivered ?p ?d) ; Mark the package as delivered to its destination
+        (delivered ?p) ; Mark the package as delivered to its destination
         (free ?r) ; Robot is now free (not holding any package)
-        (stored ?p ?l) ; After delivery, the package is considered stored at the destination location
+        (package-at ?p ?l) ; After delivery, the package is considered at the destination location
     )
 )
 

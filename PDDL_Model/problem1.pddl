@@ -7,15 +7,13 @@
     l3 - location
     l4 - location
     l5 - location
-    d - destination
 )
 
 (:init
     (at r l1) ; Robot starts at location l1
     (free r) ; Robot starts free (not holding any package)
-    (stored p l2) ; Package p is at location l2
-    (has p d) ; Package p is destined for destination d
-    (labeled l5 d) ; Location l5 is labeled as destination d
+    (package-at p l5) ; Package p is at location l5
+    (goal-location p l2) ; Package p is destined for destination l2
     (connected l1 l2) ; Location l1 is connected to location l2
     (connected l2 l1) ; Location l2 is connected to location l1
     (connected l2 l3) ; Location l2 is connected to location l3
@@ -27,7 +25,7 @@
 )
 
 (:goal (and
-    (delivered p d) ; Package p has been delivered to destination d
+    (delivered p) ; Package p has been delivered to its destination
 ))
 
 )
