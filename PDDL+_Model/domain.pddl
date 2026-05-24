@@ -10,73 +10,118 @@
 (:predicates 
     (at ?r - robot ?l - location) ; Robot r is at location l
     (free ?r - robot) ; Robot r is free (not holding any package)
+    (moving ?r - robot) ; Robot r is currently moving between locations
+    (transiting ?r - robot ?from - location ?to - location) ; Robot r is currently moving from location ?from to location ?to
     (connected ?l1 - location ?l2 - location) ; Location l1 is connected to location l2
-    (stored ?p - package ?l - location) ; Package p is at location l
-    (has ?p - package ?d - destination) ; Package p is destined for destination d
-    (labeled ?l - location ?d - destination) ; Location l is labeled as destination d
-    (delivered ?p - package ?d - destination) ; Package p has been delivered to its destination (assuming it's only one destination per package)
+    (package-at ?p - package ?l - location) ; Package p is at location l
+    (goal-location ?p - package ?l - location) ; Package p has a goal location l
+    (delivered ?p - package) ; Package p has been delivered to its destination (assuming it's only one destination per package)
     (overdue ?p - package) ; Package p has missed its deadline
     (holding ?r - robot ?p - package) ; Robot r is holding package p
 )
 
 (:functions         
     (elapsed-time) ; Numeric fluent to track total elapsed time
+    (travel-time ?from - location ?to - location) ; Numeric fluent to represent the time it takes to travel from one location to another
+    (move-progress ?r - robot) ; Numeric fluent to represent the progress of the robot's movement between locations (0 to travel-time)
     (deadline ?p - package) ; Numeric deadline assigned per package in the problem file
 )
 
 ; Process to model the passage of time, which is necessary for the action-delay event to function properly
 (:process time-passage
-    :parameters ()
-    :precondition (>= (elapsed-time) 0) ; Always true, but ensures the process is active
-    :effect (increase (elapsed-time) (* #t 1)) ; Increase elapsed time by 1 continupously as time passes
+    :parameters (?r - robot)
+    :precondition 
+        (>= (elapsed-time) 0) ; Always true, but ensures the process is active
+    :effect
+        (increase (elapsed-time) (* #t 1)) ; Increase elapsed time by 1 unit per time unit
 )
 
-; Example action for picking up a package
+; The idea is that the robot goes from one specific point of a location l1 to another specific point of a location l2, 
+; this movement is what takes time. The position reached by the robot in any location could be considered the station
+; where the actual pick-up or drop-off actions take place, and the robot can only pick up or drop off packages when 
+; it is at that station. These specific locations don't need to be modeled explicitly, after all picking up or
+; dropping off a package can only be done when the robot is at the location, so we can assume that 
+; the robot is at the station when it is at the location.
+; This way, the action-delay process is activated when the robot starts moving from one location to another, 
+; and deactivated when it arrives at the destination, allowing the elapsed time to increase during the movement and trigger the deadline-missed event if the deadline is exceeded.
+
+
+; Process to model the robot's movement between locations, which takes time and can lead to missing deadlines
+(:process moving-process
+    :parameters (?r - robot)
+
+    :precondition (moving ?r)
+
+    :effect
+        (increase (move-progress ?r) (* #t 1))
+)
+
+; Action for picking up a package
 (:action pick-up
-    :parameters (?r - robot ?p - package ?l - location ?d - destination)
+    :parameters (?r - robot ?p - package ?l - location)
     :precondition (and 
         (at ?r ?l) 
-        (stored ?p ?l)
+        (package-at ?p ?l)
         (free ?r) ; Robot is free (not holding any package) -> otherwise it may be already holding another package
-        (has ?p ?d) ; Package has a destination -> otherwise it may be an irrelevant package, also it ensures actions matche correct package-destination pairs
         (not (holding ?r ?p)) ; Robot can hold only one package at a time
-        (not (delivered ?p ?d)) ; Package cannot be picked up if it's already delivered
+        (not (delivered ?p)) ; Package cannot be picked up if it's already delivered
     )
     :effect (and 
-        (not (stored ?p ?l)) 
+        (not (package-at ?p ?l)) 
         (holding ?r ?p)
         (not (free ?r))
     )
 )
 
-; Example action for delivering a package
+; Action for delivering a package. Packages can be delivered even if they are overdue, but the goal is to minimize elapsed time to avoid that.
 (:action drop-off
-    :parameters (?r - robot ?p - package ?d - destination ?l - location)
+    :parameters (?r - robot ?p - package ?l - location)
     :precondition (and 
         (at ?r ?l)
-        (labeled ?l ?d) ; Robot must be at a location labeled as the package's destination
+        (goal-location ?p ?l) ; Robot must be at a location that is the package's goal location to deliver it
         (holding ?r ?p)
-        (has ?p ?d)
-        (<= (elapsed-time) (deadline ?p)) ; Package must be delivered before its deadline
+        (not (delivered ?p)) ; Package cannot be delivered if it's already delivered
     )
     :effect (and 
         (not (holding ?r ?p)) 
-        (delivered ?p ?d) ; Mark the package as delivered to its destination
+        (delivered ?p) ; Mark the package as delivered
         (free ?r) ; Robot is now free (not holding any package)
-        (stored ?p ?l) ; After delivery, the package is considered stored at the destination location
+        (package-at ?p ?l) ; After delivery, the package is considered at the destination location
     )
 )
 
-; Example action for moving the robot from one location to another
-(:action move
+; Action to start moving the robot from one location to another, which activates the moving-process and allows time to pass during the movement
+(:action start-move
     :parameters (?r - robot ?from - location ?to - location)
+
     :precondition (and
         (at ?r ?from)
         (connected ?from ?to)
+        (not (moving ?r))
     )
-    :effect (and 
-        (not (at ?r ?from)) 
+
+    :effect (and
+        (moving ?r)
+        (transiting ?r ?from ?to)
+        (not (at ?r ?from))
+        (assign (move-progress ?r) 0)
+    )
+)
+
+; Action to finish moving the robot from one location to another, which deactivates the moving-process and updates the robot's location
+(:action finish-move
+    :parameters (?r - robot ?from - location ?to - location)
+
+    :precondition (and
+        (moving ?r)
+        (transiting ?r ?from ?to)
+        (>= (move-progress ?r) (travel-time ?from ?to))
+    )
+
+    :effect (and
         (at ?r ?to)
+        (not (transiting ?r ?from ?to))
+        (not (moving ?r))
     )
 )
 
@@ -84,7 +129,8 @@
 (:event deadline-missed
     :parameters (?p - package)
     :precondition (and
-        (> (elapsed-time) (deadline ?p))
+        (>= (elapsed-time) (deadline ?p))
+        (not (delivered ?p))
         (not (overdue ?p))
     )
     :effect (overdue ?p)

@@ -7,15 +7,23 @@
     l3 - location
     l4 - location
     l5 - location
-    d - destination
 )
 
 (:init
+    ; omitting moving -> false
     (at r l1)
     (free r)
-    (stored p l2)
-    (has p d)
-    (labeled l5 d)
+    (= (move-progress r) 0)
+    (= (travel-time l1 l2) 5)
+    (= (travel-time l2 l3) 5)
+    (= (travel-time l3 l4) 5)
+    (= (travel-time l4 l5) 5)
+
+    (package-at p l2)
+    (goal-location p l5)
+    (= (deadline p) 25) ; Solvable problem with 'overdue' constraint
+    ;(= (deadline p) 20) ; Unsolvable problem with 'overdue' constraint
+
     (connected l1 l2)
     (connected l2 l1)
     (connected l2 l3)
@@ -26,11 +34,11 @@
     (connected l5 l4)
 
     (= (elapsed-time) 0)
-    (= (deadline p) 6)
 )
 
 (:goal (and
-    (delivered p d)
+    (delivered p)
+    (not (overdue p))
 ))
 
 (:metric minimize (elapsed-time))
