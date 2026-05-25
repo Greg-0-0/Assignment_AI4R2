@@ -10,11 +10,13 @@
 (:predicates
     (at ?r - robot ?l - location) ; Robot r is at location l
     (free ?r - robot) ; Robot r is free (not holding any package)
+    (holding ?r - robot ?p - package) ; Robot r is holding package p
+
     (connected ?l1 - location ?l2 - location) ; Location l1 is connected to location l2
+    
     (package-at ?p - package ?l - location) ; Package p is at location l
     (goal-location ?p - package ?l - location) ; Package p has a goal location l
     (delivered ?p - package) ; Package p has been delivered to its destination (assuming it's only one destination per package)
-    (holding ?r - robot ?p - package) ; Robot r is holding package p
 )
 
 

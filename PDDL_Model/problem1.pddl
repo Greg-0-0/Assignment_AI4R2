@@ -12,8 +12,10 @@
 (:init
     (at r l1) ; Robot starts at location l1
     (free r) ; Robot starts free (not holding any package)
+
     (package-at p l5) ; Package p is at location l5
     (goal-location p l2) ; Package p is destined for destination l2
+    
     (connected l1 l2) ; Location l1 is connected to location l2
     (connected l2 l1) ; Location l2 is connected to location l1
     (connected l2 l3) ; Location l2 is connected to location l3
