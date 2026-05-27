@@ -58,8 +58,7 @@ Conceptually, they are the same as those of the previous domain, but there are s
 A problem file has been defined to test the domain, to do so it is necessary to initialise all the fluent values at the beginning:
 - the time required to travel between each couple of communicating locations (it can be different for each pair to generate various types of maps).
 - the initial global time value (usually zero).
-- the deadline for each package defined in the problem (the value is to be considered relative to the global time).
-Obviously, the robot is initially halted, so the 'moving' predicate must be omitted.
+- the deadline for each package defined in the problem (the value is to be considered relative to the global time).Obviously, the robot is initially halted, so the 'moving' predicate must be omitted.
 Concerning the objectives, the robot has to deliver all packages within the corresponding time limit. However, it is also possbile to simplify the goal, and leave out the deadlines.
 
 ## Discussion
