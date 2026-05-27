@@ -44,7 +44,8 @@
 ; the robot is at the station when it is at the location. Furthermore, the robot cannot executing pick-up or 
 ; drop-off actions while it is moving.
 ; This way, the action-delay process is activated when the robot starts moving from one location to another, 
-; and deactivated when it arrives at the destination, allowing the elapsed time to increase during the movement and trigger the deadline-missed event if the deadline is exceeded.
+; and deactivated when it arrives at the destination, allowing the elapsed time to increase during the movement and 
+; trigger the deadline-missed event if the deadline is exceeded.
 
 
 ; Process to model the robot's movement between locations, which takes time and can lead to missing deadlines
