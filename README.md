@@ -1,74 +1,58 @@
 # Assignment D3-V1: Warehouse Robotics – Single Robot Pick-and-Deliver - AI4R2
-The assignment required to model a warehouse environment using PDDL lagnuage. The scenario had to feature a single mobile robot capable of picking up packages and delivering them to predefined locations.
 
+This repository models a warehouse environment in PDDL and PDDL+ for a single mobile robot that picks up packages and delivers them to predefined destinations.
 
-The implementation comprises two separate models.
+The implementation contains two domains: a basic PDDL domain (navigation + manipulation) and an extended PDDL+ domain (adds time, processes and events for deadlines).
 
 ## PDDL model
-The domain was implemented using basic pddl tools to provide simple navigation capabilites of a multi-structured environment, and package manipulation for pick-up and drop-off actions.
 
-### Predicates
-- 'at' and 'package-at' provide an explicit representation of both the robot and the package position.
-- 'free' and 'holding' ensure that the robot can pick up only one package at a time, and show which package is being currently carried. Even though they may seem redundant, both are necessary. Indeed, using only the first one wouldn't provide information on the package taken, while the second predicate alone wouldn't prevent a robot, already carring a package, from picking up a different one.
-- 'connected' helps to define the warehouse structure, which can be designed at will.
-- 'goal-location' allows to clearly state the final destination for each package, while 'delivered' avoids multiple dispatches for the same package. In a problem initialisation phase, the 'goal-location' predicate has to be set for each existing package to ensure the planner takes all of them into account. // tries to deliver all of them, obviously it's not assured it will succeed (problem may be non-solvable)
+The basic domain implements explicit movement and package manipulation.
 
-### Actions
-- 'move' allows the robot to navigate between locations connected to the current one. The action doesn't permit to jump locations, and it is not symmetrical by default.
-- 'pick-up' and 'drop-off' explicitly implement package manipulation, securing the robot can hold only one item at a time.
+- **Key predicates:** `at`, `package-at`, `free`, `holding`, `connected`, `goal-location`, `delivered`.
+- **Core actions:** `move`, `pick-up`, `drop-off`.
 
-It is assumed that the robot can take or leave packages only when it is not moving, however, since actions are instantaneous, it is not necessary to model this dynamic.
+Notes:
+- `move` is explicit and only allowed between `connected` locations (no teleporting).
+- `free` + `holding` together ensure the robot carries at most one package while also tracking which package is carried.
 
-## PDDL problems
-The model was tested in two different scenarios:
-- Single package delivery: the only constraint to the robot action is the necessity to have connections between locations to move around.
-- Multiple packages with sequential delivery: in addition to the limitation of the previous problem, in this case, the planner requires an higher decisional flexibility, having to redefine its main goal, as the package that needs to be delivered changes. // robot changes location of destination after delivering a package, usually choosing the closest parcel
+### Problems
+- `problem1.pddl`: single-package delivery test.
+- `problem2.pddl`: multiple packages requiring sequential deliveries.
 
-The PDDL domain structure allows to find a plan for problems with any amount of packages to be delivered.
+The domain supports arbitrary numbers of packages, but plan length and complexity grow with problem size.
 
 ## PDDL+ model
-This domain, in addition to the characteristics of the previous one, models time for the robot motion to simulate missed deadlines in package distribution. This is achieved employing PDDL+ tools such as processes and events, which make the action of moving not instantaneous anymore, and by splitting the robot movement in two steps.
 
-### Predicates
-Supplementary to those dispalyed in the previous design:
-- 'moving' and 'transiting' are used to correctly carry out the movement action, ensuring it is not immediate anymore. In particular, the first predicate is used to trigger the process that simulates the passage of time, as well as preventing the robot from picking up or dropping off items during motion. Indeed, in a real scenario, it would be natural to assure that these operations are executed safely. The second one is used to link the two actions that make up the motion of the robot, more precisely they gurantee that the rooms used in the first step are also those used in the second one, otherwise the robot might be able to move to room not directly connected to the initial one, thus teleporting itself.
-- 'overdue' serves the purpose to notify if a package has been delivered beyond its deadline.
+The PDDL+ domain extends the basic model by making motion durative via processes and events, enabling deadline checks.
 
-### Functions
-Fluents added to model the time spent during transportation and deadlines:
-- 'elapsed-time' tracks the global time which is necessary to identify delays.
-- 'travel-time' represents the amount of time necessary to move from one location to another.
-- 'move-progress' keeps track of the robot's movement between two locations.
-- 'deadline' defines for each package the time limit, with respect to 'elapsed-time' = 0, within which the delivery must be conlcuded.
+- **Additional predicates:** `moving`, `transiting`, `overdue`.
+- **Numeric fluents:** `elapsed-time`, `travel-time`, `move-progress`, `deadline`.
+- **Processes:** `time-passage` (global time) and `moving-process` (progress while moving).
+- **Actions:** split motion into `start-move` and `finish-move`; `pick-up`/`drop-off` require the robot not to be `moving`.
+- **Event:** `deadline-missed` marks packages `overdue` when `elapsed-time` exceeds their `deadline`.
 
-### Processes
-They allow to change the fluents value linearly with time:
-- 'time-passage' models the passage of global time itself, which is used to trigger delays when deadlines are not met.
-- 'move-process' simulates the progression of the robot's movement between two sections by increasing the 'move-progress' value.
-
-### Actions
-Conceptually, they are the same as those of the previous domain, but there are some changes due to the introduction of time:
-- 'pick-up' and 'drop-off' now can be executed only when the robot is not moving.
-- 'start-move' and 'finish-move' define the two steps of robot motion. The sequence of action is controlled by 'move-progress', which, after 'start-move' executes, is linearly increased with time by the process 'moving-process'. Once the threshold 'travel-time' is reached, 'finish-move' executes, allowing the robot to pick-up/drop-off objects or move again.
-
-### Effect
-'deadline-missed' sets a package as 'overdue' if it has not been delivered within its deadline. Depending on the problem definition this may cause it to be unsolvable (in some cases it may be acceptable to have parcels arrive late at destination).
-
-## PDDL+ problem
-A problem file has been defined to test the domain, to do so it is necessary to initialise all the fluent values at the beginning:
-- the time required to travel between each couple of communicating locations (it can be different for each pair to generate various types of maps).
-- the initial global time value (usually zero).
-- the deadline for each package defined in the problem (the value is to be considered relative to the global time).Obviously, the robot is initially halted, so the 'moving' predicate must be omitted.
-Concerning the objectives, the robot has to deliver all packages within the corresponding time limit. However, it is also possbile to simplify the goal, and leave out the deadlines.
+### PDDL+ problem
+See `PDDL+_Model/problem.pddl` for an example initialisation: travel times, deadlines and initial `elapsed-time` are set in the problem file. The example goal requires delivery without being `overdue`.
 
 ## Discussion
 
+Strengths:
+- Clear separation of navigation and manipulation, making the basic domain easy to reason about.
+- PDDL+ model captures temporal behaviour and deadlines using processes/events.
 
+Limitations:
+- **Scalability:** Plans grow rapidly with multiple packages since a single robot must perform sequential deliveries; this increases search complexity and likelihood of missed deadlines.
+- **Sequential-only behaviour:** The single-robot, single-package-capacity assumption prevents concurrency (simultaneous deliveries, parallel robot actions).
 
-// -- -- -- -- //
+Possible extensions:
+- Add multiple robots (requires synchronization and collision avoidance).
+- Support carrying multiple packages (introduce capacity/weight constraints and local storage state).
+- Add route optimization or local planning to cluster nearby deliveries and reduce elapsed time.
 
-• scalability from single to multiple packages: multiple capacity (weight limitation and local database) or multiple robots (sinchronyzation problem)
-• limitations of purely sequential planning: deadlines -> multiple robots for parallel delivery (sinchronyzation problem)
+## Files
+- PDDL model: [PDDL_Model/domain.pddl](PDDL_Model/domain.pddl)
+- PDDL problems: [PDDL_Model/problem1.pddl](PDDL_Model/problem1.pddl), [PDDL_Model/problem2.pddl](PDDL_Model/problem2.pddl)
+- PDDL+ model: [PDDL+_Model/domain.pddl](PDDL+_Model/domain.pddl)
+- PDDL+ problem: [PDDL+_Model/problem.pddl](PDDL+_Model/problem.pddl)
 
-// how is the readme: is it too explanatory? need to put less info in the readme and more in the comments?
-// how are the domains: is the movement explicit(move)? and the problems
+--
