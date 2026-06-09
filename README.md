@@ -55,5 +55,3 @@ Possible extensions:
 - PDDL problems: [PDDL_Model/problem1.pddl](PDDL_Model/problem1.pddl), [PDDL_Model/problem2.pddl](PDDL_Model/problem2.pddl)
 - PDDL+ model: [PDDL+_Model/domain.pddl](PDDL+_Model/domain.pddl)
 - PDDL+ problem: [PDDL+_Model/problem.pddl](PDDL+_Model/problem.pddl)
-
---
