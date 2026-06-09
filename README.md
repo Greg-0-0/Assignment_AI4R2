@@ -23,7 +23,7 @@ The domain supports arbitrary numbers of packages, but plan length and complexit
 
 ## PDDL+ model
 
-The PDDL+ domain extends the basic model by making motion durative via processes and events, enabling deadline checks.
+The PDDL+ domain extends the basic model by implementing time-dependent movement via processes and events, enabling deadline checks.
 
 - **Additional predicates:** `moving`, `transiting`, `overdue`.
 - **Numeric fluents:** `elapsed-time`, `travel-time`, `move-progress`, `deadline`.
@@ -33,6 +33,7 @@ The PDDL+ domain extends the basic model by making motion durative via processes
 
 ### PDDL+ problem
 See `PDDL+_Model/problem.pddl` for an example initialisation: travel times, deadlines and initial `elapsed-time` are set in the problem file. The example goal requires delivery without being `overdue`.
+The problem can be configured with different travel times and deadlines, allowing to test both feasible and unfeasible scenarios.
 
 ## Discussion
 
@@ -41,7 +42,7 @@ Strengths:
 - PDDL+ model captures temporal behaviour and deadlines using processes/events.
 
 Limitations:
-- **Scalability:** Plans grow rapidly with multiple packages since a single robot must perform sequential deliveries; this increases search complexity and likelihood of missed deadlines.
+- **Scalability:** Plans grow rapidly with multiple packages since a single robot has to perform all deliveries in sequence; this increases search complexity and likelihood of missed deadlines.
 - **Sequential-only behaviour:** The single-robot, single-package-capacity assumption prevents concurrency (simultaneous deliveries, parallel robot actions).
 
 Possible extensions:
