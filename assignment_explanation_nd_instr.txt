@@ -1,0 +1,49 @@
+Assignment D3-V1: Warehouse Robotics – Single Robot Pick-and-Deliver
+SCENARIO
+    A mobile robot operates in a warehouse composed of storage locations and
+    delivery zones. The robot must pick up packages from storage areas and deliver
+    them to specified destinations.
+    The robot can carry only one package at a time and must navigate between
+    locations using predefined connections.
+DOMAIN CHARACTERISTICS
+    • Robot: single mobile robot
+    • Environment: graph of warehouse locations
+    • Tasks: pick, transport, deliver
+    • Constraints: single-package capacity
+MODELLING GUIDELINES
+    • Explicitly model robot position and package location.
+    • Represent pick and drop actions separately.
+    • Avoid implicit transport (movement must be explicit).
+    • Ensure that carrying constraints influence planning.
+Q1 – Basic PDDL Model
+You must:
+    • Model navigation and manipulation.
+    • Provide:
+        – one simple problem (single package)
+        – one more complex problem (multiple packages, sequential delivery)
+    • Provide valid plans.
+Q2 – PDDL+ Model
+You must:
+    • Introduce a process modelling time spent in transportation.
+    • Introduce an event representing delivery deadlines or delays.
+    • Show how timing influences delivery feasibility.
+DISCUSSION
+Discuss:
+    • scalability from single to multiple packages
+    • limitations of purely sequential planning
+
+------------------------------------------------------------------------------
+For PDDL model:
+use LAMA
+
+For PDDL+ model:
+run ENHSP planner with (execute in directory PDDL+_Model)
+1. problem 1
+    java -jar ~/enhsp/ENHSP-Public/enhsp-dist/enhsp.jar \
+    -o domain.pddl -f /home/gregorio/Documents/User_documents/Robotics_Engineering/AI4R2/Assignment_AI4R2/PDDL+_Model/problem1.pddl
+2. problem 2
+    java -jar ~/enhsp/ENHSP-Public/enhsp-dist/enhsp.jar \
+    -o domain.pddl -f /home/gregorio/Documents/User_documents/Robotics_Engineering/AI4R2/Assignment_AI4R2/PDDL+_Model/problem2.pddl
+
+Add output windows and terminal to report (also for explanation during presentation)
+slides
