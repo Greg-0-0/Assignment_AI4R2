@@ -1,7 +1,0 @@
-For PDDL model:
-use LAMA
-
-For PDDL+ model:
-run ENHSP planner with (execute in directory PDDL+_Model)
-java -jar ~/enhsp/ENHSP-Public/enhsp-dist/enhsp.jar \
-  -o domain.pddl -f /home/gregorio/Documents/User_documents/Robotics_Engineering/AI4R2/Assignment_AI4R2/PDDL+_Model/problem.pddl
