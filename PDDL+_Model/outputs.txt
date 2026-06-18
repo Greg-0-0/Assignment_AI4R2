@@ -1,0 +1,62 @@
+As requested here are the terminal outputs of the PDDL+ problems:
+- problem 1:
+    0: -----waiting---- [1.0]
+    1.0: (start-move r l1 l2)
+    1.0: -----waiting---- [6.0]
+    6.0: (finish-move r l1 l2)
+    6.0: (pick-up r p l2)
+    6.0: (start-move r l2 l3)
+    6.0: -----waiting---- [11.0]
+    11.0: (finish-move r l2 l3)
+    11.0: (start-move r l3 l4)
+    11.0: -----waiting---- [16.0]
+    16.0: (finish-move r l3 l4)
+    16.0: (start-move r l4 l5)
+    16.0: -----waiting---- [21.0]
+    21.0: (finish-move r l4 l5)
+    21.0: (drop-off r p l5)
+
+    Plan-Length:31
+    Elapsed Time: 21.0
+    Metric (Search):21.0
+    Planning Time (msec): 45
+    Heuristic Time (msec): 22
+    Search Time (msec): 42
+- problem 2:
+    0: -----waiting---- [1.0]
+    1.0: (start-move r l1 l2)
+    1.0: -----waiting---- [6.0]
+    6.0: (finish-move r l1 l2)
+    6.0: (pick-up r p1 l2)
+    6.0: (start-move r l2 l3)
+    6.0: -----waiting---- [11.0]
+    11.0: (finish-move r l2 l3)
+    11.0: (start-move r l3 l4)
+    11.0: -----waiting---- [16.0]
+    16.0: (finish-move r l3 l4)
+    16.0: (start-move r l4 l5)
+    16.0: -----waiting---- [21.0]
+    21.0: (finish-move r l4 l5)
+    21.0: (drop-off r p1 l5)
+    21.0: -----waiting---- [22.0]
+    22.0: (start-move r l5 l4)
+    22.0: -----waiting---- [28.0]
+    28.0: (finish-move r l5 l4)
+    28.0: (pick-up r p2 l4)
+    28.0: (start-move r l4 l3)
+    28.0: -----waiting---- [33.0]
+    33.0: (finish-move r l4 l3)
+    33.0: (start-move r l3 l2)
+    33.0: -----waiting---- [38.0]
+    38.0: (finish-move r l3 l2)
+    38.0: (start-move r l2 l1)
+    38.0: -----waiting---- [43.0]
+    43.0: (finish-move r l2 l1)
+    43.0: (drop-off r p2 l1)
+
+    Plan-Length:63
+    Elapsed Time: 43.0
+    Metric (Search):43.0
+    Planning Time (msec): 67
+    Heuristic Time (msec): 35
+    Search Time (msec): 65

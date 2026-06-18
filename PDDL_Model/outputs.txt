@@ -1,0 +1,31 @@
+As requested here are the terminal outputs of the PDDL problems:
+- problem 1:
+    0.00000: (move r l1 l2)
+    0.00100: (move r l2 l3)
+    0.00200: (move r l3 l4)
+    0.00300: (move r l4 l5)
+    0.00400: (pick-up r p l5)
+    0.00500: (move r l5 l4)
+    0.00600: (move r l4 l3)
+    0.00700: (move r l3 l2)
+    0.00800: (drop-off r p l2)
+    --------------------------
+    Metric: 0.008
+    Makespan: 0.008
+- problem 2:
+    0.00000: (pick-up r p1 l1)
+    0.00100: (move r l1 l2)
+    0.00200: (drop-off r p1 l2)
+    0.00300: (pick-up r p3 l2)
+    0.00400: (move r l2 l3)
+    0.00500: (move r l3 l4)
+    0.00600: (move r l4 l5)
+    0.00700: (drop-off r p3 l5)
+    0.00800: (move r l5 l4)
+    0.00900: (move r l4 l3)
+    0.01000: (pick-up r p2 l3)
+    0.01100: (move r l3 l4)
+    0.01200: (drop-off r p2 l4)
+    ---------------------------
+    Metric: 0.012000000000000004
+    Makespan: 0.012000000000000004
