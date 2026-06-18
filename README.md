@@ -53,7 +53,9 @@ Possible extensions:
 ## Files
 - PDDL model: [PDDL_Model/domain.pddl](PDDL_Model/domain.pddl)
 - PDDL problems: [PDDL_Model/problem1.pddl](PDDL_Model/problem1.pddl), [PDDL_Model/problem2.pddl](PDDL_Model/problem2.pddl)
+- PDDL problem outputs: [PDDL_Model/outputs.txt](PDDL_Model/outputs.txt)
 - PDDL+ model: [PDDL+_Model/domain.pddl](PDDL+_Model/domain.pddl)
-- PDDL+ problem: [PDDL+_Model/problem.pddl](PDDL+_Model/problem.pddl)
+- PDDL+ problems: [PDDL+_Model/problem.pddl](PDDL+_Model/problem.pddl), [PDDL+_Model/problem2.pddl](PDDL+_Model/problem2.pddl)
+- PDDL+ problem outputs: [PDDL+_Model/outputs.txt](PDDL+_Model/outputs.txt)
 - Assignment Report: [AI4R2AssignmentReport](AI4R2AssignmentReport.pdf)
 - README file
