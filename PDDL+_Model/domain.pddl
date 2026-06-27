@@ -36,18 +36,6 @@
         (increase (elapsed-time) (* #t 1)) ; Increase elapsed time by 1 unit per time unit
 )
 
-; The idea is that the robot goes from one specific point of a location l1 to another specific point of a location l2, 
-; this movement is what takes time. The position reached by the robot in any location could be considered the station
-; where the actual pick-up or drop-off actions take place, and the robot can only pick up or drop off packages when 
-; it is at that station. These specific locations don't need to be modeled explicitly, after all picking up or
-; dropping off a package can only be done when the robot is at the location, so we can assume that 
-; the robot is at the station when it is at the location. Furthermore, the robot cannot executing pick-up or 
-; drop-off actions while it is moving.
-; This way, the action-delay process is activated when the robot starts moving from one location to another, 
-; and deactivated when it arrives at the destination, allowing the elapsed time to increase during the movement and 
-; trigger the deadline-missed event if the deadline is exceeded.
-
-
 ; Process to model the robot's movement between locations, which takes time and can lead to missing deadlines
 (:process moving-process
     :parameters (?r - robot)
