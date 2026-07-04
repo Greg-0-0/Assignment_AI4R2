@@ -60,3 +60,5 @@ Possible extensions:
 - Assignment Report: [AI4R2AssignmentReport](AI4R2AssignmentReport.pdf)
 - Presentation: [AI4R2Presentation](AI4R2Presentation.pdf)
 - README file
+- ## Observation
+The submitted codes and report have been thoroughly reviewed by the teaching assistant, Omar Kashmar.
